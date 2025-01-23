@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 
 @Composable
 fun Navigation(navController: NavHostController, builder: AlertDialog.Builder, sharedPreferences: SharedPreferences) {
-    val loginStatus = sharedPreferences.getBoolean("IsUserLoggedIn", false)
+    val loginStatus = sharedPreferences.getBoolean("Login", false)
     val startDestination = if (loginStatus) { Home.route } else { Onboarding.route }
 
     NavHost(navController = navController, startDestination = startDestination)
@@ -21,7 +21,7 @@ fun Navigation(navController: NavHostController, builder: AlertDialog.Builder, s
             Home(navController)
         }
         composable(route = Profile.route) {
-            Profile()
+            Profile(navController, sharedPreferences = sharedPreferences)
         }
     }
 }

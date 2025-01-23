@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -49,8 +48,10 @@ fun OnBoarding(navController: NavHostController, builder: AlertDialog.Builder, s
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Little Lemon Logo",
-                modifier = Modifier.padding(vertical = 20.dp).height(40.dp),
-                contentScale = ContentScale.FillHeight
+                modifier = Modifier
+                    .padding(vertical = 20.dp)
+                    .size(width = 200.dp, height = 40.dp)
+                    .align(alignment = Alignment.CenterVertically)
             )
         }
         Row(
@@ -132,7 +133,10 @@ fun OnBoarding(navController: NavHostController, builder: AlertDialog.Builder, s
                     if (!firstName.isBlank() && !lastName.isBlank() && !email.isBlank())
                     {
                         builder.setMessage("Registration successful!").show()
-                        sharedPreferences.edit().putBoolean("IsUserLoggedIn", true).apply()
+                        sharedPreferences.edit().putString("FirstName", firstName).apply()
+                        sharedPreferences.edit().putString("LastName", lastName).apply()
+                        sharedPreferences.edit().putString("Email", email).apply()
+                        sharedPreferences.edit().putBoolean("Login", true).apply()
                         navController.navigate(Home.route)
                     } else {
                         builder.setMessage("Registration unsuccessful.Please enter all data.").show()
