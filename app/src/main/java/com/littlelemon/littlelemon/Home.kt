@@ -2,9 +2,11 @@ package com.littlelemon.littlelemon
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,19 +17,35 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -39,6 +57,10 @@ import com.littlelemon.littlelemon.ui.theme.LittleLemonColor
 @Composable
 fun Home(navController: NavHostController, databaseMenuItems: List<MenuItemRoom>) {
     Column() {
+        var searchPhrase by remember { mutableStateOf("") }
+        var buttonState = remember { mutableStateOf(ButtonState.OFF) }
+        var filteredItems: List<MenuItemRoom> = emptyList()
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
@@ -69,7 +91,7 @@ fun Home(navController: NavHostController, databaseMenuItems: List<MenuItemRoom>
         }
         Column (
             modifier = Modifier
-                .height(300.dp)
+                .height(320.dp)
                 .fillMaxWidth()
                 .background(color = LittleLemonColor.green)
         ) {
@@ -80,18 +102,20 @@ fun Home(navController: NavHostController, databaseMenuItems: List<MenuItemRoom>
                 fontSize = 64.sp,
                 fontFamily = FontFamily(Font(R.font.markazitext_variablefont_wght, FontWeight.Medium))
             )
-            Row {
+            Row(
+                modifier = Modifier.padding(horizontal = 15.dp).fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Column() {
                     Text(
                         text = "Chicago",
-                        modifier = Modifier.padding(start = 15.dp),
                         color = LittleLemonColor.cloud,
                         fontSize = 40.sp,
                         fontFamily = FontFamily(Font(R.font.markazitext_variablefont_wght, FontWeight.Normal))
                     )
                     Text(
                         text = "We are a family-owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.",
-                        modifier = Modifier.width(240.dp).padding(start = 15.dp, top = 5.dp),
+                        modifier = Modifier.width(220.dp).padding(top = 5.dp),
                         color = LittleLemonColor.cloud,
                         fontSize = 18.sp,
                         fontFamily = FontFamily(Font(R.font.karla_variablefont_wght, FontWeight.Medium))
@@ -103,25 +127,111 @@ fun Home(navController: NavHostController, databaseMenuItems: List<MenuItemRoom>
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
-                        .size(width = 140.dp, height = 170.dp)
+                        .size(width = 140.dp, height = 160.dp),
                 )
             }
+            OutlinedTextField(
+                value = searchPhrase,
+                onValueChange = {searchPhrase = it},
+                modifier = Modifier
+                    .padding(start = 15.dp, end = 15.dp, top = 10.dp)
+                    .fillMaxWidth()
+                    .background(color = LittleLemonColor.cloud, shape = RoundedCornerShape(10.dp)),
+                placeholder = { Text("Enter Search Phrase") },
+                leadingIcon = { Icon( imageVector = Icons.Default.Search, contentDescription = "") },
+                textStyle = TextStyle(fontSize = 18.sp),
+            )
         }
-        Box (
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(140.dp)
-                .background(color = Color.Gray)
-        ) {  }
-        MenuItems(databaseMenuItems)
+                .height(120.dp)
+                .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 15.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "ORDER FOR DELIVERY",
+                color = LittleLemonColor.charcoal,
+                fontSize = 20.sp,
+                fontFamily = FontFamily(Font(R.font.karla_variablefont_wght, FontWeight.ExtraBold))
+            )
+            Row(
+                modifier = Modifier
+                    .height(40.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                CategoryButtons(buttonState)
+
+                filteredItems = when(buttonState.value) {
+                    ButtonState.STARTERS -> databaseMenuItems.filter { it.category.equals("starters") }
+                    ButtonState.MAINS -> databaseMenuItems.filter { it.category.equals("mains") }
+                    ButtonState.DESSERTS -> databaseMenuItems.filter { it.category.equals("desserts") }
+                    ButtonState.DRINKS -> databaseMenuItems.filter { it.category.equals("drinks") }
+                    else -> databaseMenuItems
+                }
+            }
+        }
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 15.dp),
+            thickness = 1.dp,
+            color = Color.Gray
+        )
+
+        if (searchPhrase.isNotEmpty()) {
+            filteredItems = filteredItems.filter { it.title.contains(searchPhrase, ignoreCase = true) }
+        }
+        MenuItems(filteredItems)
     }
 }
 
+//@Preview
+@Composable
+fun CategoryButtons(buttonState: MutableState<Int>) {
+    val categories = listOf("starters", "mains", "desserts", "drinks")
+
+    for (category in categories) {
+        CategoryButton(category, buttonState)
+    }
+}
+
+//@Preview
+@Composable
+fun CategoryButton(category: String, buttonState: MutableState<Int>) {
+    Button(
+        onClick = {
+            when(category) {
+                "starters" -> changeState(buttonState, ButtonState.STARTERS)
+                "mains" -> changeState(buttonState, ButtonState.MAINS)
+                "desserts" -> changeState(buttonState, ButtonState.DESSERTS)
+                "drinks" -> changeState(buttonState, ButtonState.DRINKS)
+            }
+        },
+        shape = RoundedCornerShape(10.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = LittleLemonColor.cloud),
+        contentPadding = PaddingValues(10.dp)
+    ) {
+        Text(
+            text = category,
+            color = LittleLemonColor.charcoal,
+            fontSize = 16.sp,
+            fontFamily = FontFamily(Font(R.font.karla_variablefont_wght, FontWeight.ExtraBold))
+        )
+    }
+}
+
+fun changeState(buttonState: MutableState<Int>, targetState: Int) {
+    if (buttonState.value == targetState) {
+        buttonState.value = ButtonState.OFF
+    } else {
+        buttonState.value = targetState
+    }
+}
+
+
 //@Preview(showBackground = true)
 @Composable
-fun MenuItems(databaseMenuItems: List<MenuItemRoom>) {
-    val menuItems = databaseMenuItems
-
+fun MenuItems(menuItems: List<MenuItemRoom>) {
     LazyColumn () {
         items(
             items = menuItems,
@@ -170,8 +280,9 @@ fun MenuItem(title: String, description: String, price: String, image: String) {
         )
     }
     HorizontalDivider(
+        modifier = Modifier.padding(horizontal = 15.dp),
         thickness = 1.dp,
-        color = Color.Gray
+        color = Color.LightGray
     )
 }
 
@@ -183,4 +294,12 @@ fun convertUrl(githubUrl: String): String {
     }
 
     return convertedUrl
+}
+
+object ButtonState {
+    const val OFF = 0
+    const val STARTERS = 1
+    const val MAINS = 2
+    const val DESSERTS = 3
+    const val DRINKS = 4
 }
