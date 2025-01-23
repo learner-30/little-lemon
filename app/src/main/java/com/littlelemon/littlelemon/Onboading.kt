@@ -1,5 +1,7 @@
 package com.littlelemon.littlelemon
 
+import android.app.AlertDialog
+import android.content.SharedPreferences
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -29,15 +32,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.littlelemon.littlelemon.ui.theme.LittleLemonColor
 
-
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
-fun OnBoarding() {
+fun OnBoarding(navController: NavHostController, builder: AlertDialog.Builder, sharedPreferences: SharedPreferences) {
     Column() {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -74,16 +77,67 @@ fun OnBoarding() {
                 fontWeight = FontWeight.Bold
             )
         }
-        UserInput("First name")
-        UserInput("Last name")
-        UserInput("Email")
+        var firstName by remember { mutableStateOf("") }
+        Column(
+            modifier = Modifier.padding(top = 30.dp, start = 15.dp, end = 15.dp)
+        ) {
+            Text(text = "First name", fontSize = 14.sp)
+            Spacer(modifier = Modifier.padding(top = 5.dp))
+            OutlinedTextField(
+                value = firstName,
+                onValueChange = { firstName = it },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(fontSize = 18.sp),
+                shape = RoundedCornerShape(10.dp)
+            )
+        }
+
+        var lastName by remember { mutableStateOf("") }
+        Column(
+            modifier = Modifier.padding(top = 30.dp, start = 15.dp, end = 15.dp)
+        ) {
+            Text(text = "Last name", fontSize = 14.sp)
+            Spacer(modifier = Modifier.padding(top = 5.dp))
+            OutlinedTextField(
+                value = lastName,
+                onValueChange = { lastName = it },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(fontSize = 18.sp),
+                shape = RoundedCornerShape(10.dp)
+            )
+        }
+
+        var email by remember { mutableStateOf("") }
+        Column(
+            modifier = Modifier.padding(top = 30.dp, start = 15.dp, end = 15.dp)
+        ) {
+            Text(text = "Email", fontSize = 14.sp)
+            Spacer(modifier = Modifier.padding(top = 5.dp))
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(fontSize = 18.sp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                shape = RoundedCornerShape(10.dp)
+            )
+        }
 
         Box(
             modifier = Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp, bottom = 15.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
             Button(
-                onClick = { },
+                onClick = {
+                    if (!firstName.isBlank() && !lastName.isBlank() && !email.isBlank())
+                    {
+                        builder.setMessage("Registration successful!").show()
+                        sharedPreferences.edit().putBoolean("IsUserLoggedIn", true).apply()
+                        navController.navigate(Home.route)
+                    } else {
+                        builder.setMessage("Registration unsuccessful.Please enter all data.").show()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(LittleLemonColor.yellow),
@@ -96,25 +150,5 @@ fun OnBoarding() {
                 )
             }
         }
-    }
-}
-
-
-@Composable
-fun UserInput(item: String) {
-    Column(
-        modifier = Modifier.padding(top = 30.dp, start = 15.dp, end = 15.dp)
-    ) {
-        var inputText by remember { mutableStateOf("") }
-
-        Text(text = item, fontSize = 14.sp)
-        Spacer(modifier = Modifier.padding(top = 5.dp))
-        OutlinedTextField(
-            value = inputText,
-            onValueChange = { inputText = it },
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(fontSize = 18.sp),
-            shape = RoundedCornerShape(10.dp)
-        )
     }
 }
