@@ -8,7 +8,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
 @Composable
-fun Navigation(navController: NavHostController, builder: AlertDialog.Builder, sharedPreferences: SharedPreferences) {
+fun Navigation(navController: NavHostController,
+               builder: AlertDialog.Builder,
+               sharedPreferences: SharedPreferences,
+               databaseMenuItems: List<MenuItemRoom>) {
     val loginStatus = sharedPreferences.getBoolean("Login", false)
     val startDestination = if (loginStatus) { Home.route } else { Onboarding.route }
 
@@ -18,7 +21,7 @@ fun Navigation(navController: NavHostController, builder: AlertDialog.Builder, s
             OnBoarding(navController, builder, sharedPreferences = sharedPreferences)
         }
         composable(route = Home.route) {
-            Home(navController)
+            Home(navController, databaseMenuItems)
         }
         composable(route = Profile.route) {
             Profile(navController, sharedPreferences = sharedPreferences)
