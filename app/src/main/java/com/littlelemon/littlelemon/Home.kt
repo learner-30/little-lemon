@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -62,7 +65,9 @@ fun Home(navController: NavHostController, databaseMenuItems: List<MenuItemRoom>
         var filteredItems: List<MenuItemRoom> = emptyList()
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
             Image(
@@ -244,10 +249,11 @@ fun MenuItems(menuItems: List<MenuItemRoom>) {
 @Composable
 fun MenuItem(title: String, description: String, price: String, image: String) {
     Row(
-        modifier = Modifier.padding(start = 15.dp).height(140.dp).fillMaxWidth(),
+        modifier = Modifier.padding(horizontal = 15.dp).height(140.dp).fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
-            modifier = Modifier.width(280.dp),
+            modifier = Modifier.width(230.dp),
         ) {
             Spacer(modifier = Modifier.padding(top = 5.dp))
             Text(
@@ -275,7 +281,7 @@ fun MenuItem(title: String, description: String, price: String, image: String) {
         GlideImage(
             model = convertUrl(image),
             contentDescription = title,
-            modifier = Modifier.padding(top = 20.dp).size(100.dp),
+            modifier = Modifier.padding(top = 20.dp).size(90.dp),
             contentScale = ContentScale.Crop,
         )
     }
