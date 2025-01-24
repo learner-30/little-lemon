@@ -237,7 +237,9 @@ fun changeState(buttonState: MutableState<Int>, targetState: Int) {
 //@Preview(showBackground = true)
 @Composable
 fun MenuItems(menuItems: List<MenuItemRoom>) {
-    LazyColumn () {
+    LazyColumn (
+        modifier = Modifier.padding(bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding())
+    ) {
         items(
             items = menuItems,
             itemContent = { menu -> MenuItem(menu.title, menu.description, menu.price, menu.image) }
