@@ -2,6 +2,8 @@ package com.littlelemon.littlelemon
 
 import android.app.AlertDialog
 import android.content.SharedPreferences
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,9 +32,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -42,16 +50,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.littlelemon.littlelemon.ui.theme.LittleLemonColor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 //@Preview(showBackground = true)
 @Composable
 fun OnBoarding(navController: NavHostController, builder: AlertDialog.Builder, sharedPreferences: SharedPreferences) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     Column(
-        modifier = Modifier.pointerInput(Unit) {
+        modifier = Modifier
+            .pointerInput(Unit) {
             detectTapGestures(onTap = {
                 keyboardController?.hide()
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(30)
+                    focusManager.clearFocus()
+                }
             })
         }
     ) {

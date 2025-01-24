@@ -60,18 +60,28 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.littlelemon.littlelemon.ui.theme.LittleLemonColor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 //@Preview(showBackground = true)
 @Composable
 fun Home(navController: NavHostController, databaseMenuItems: List<MenuItemRoom>) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     Column(
-        modifier = Modifier.pointerInput(Unit) {
-            detectTapGestures(onTap = {
-                keyboardController?.hide()
-            })
-        }
+        modifier = Modifier
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    keyboardController?.hide()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        delay(30)
+                        focusManager.clearFocus()
+                    }
+                })
+            }
     ) {
         var searchPhrase by remember { mutableStateOf("") }
         var buttonState = remember { mutableStateOf(ButtonState.OFF) }
