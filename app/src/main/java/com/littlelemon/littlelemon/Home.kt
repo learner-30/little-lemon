@@ -3,6 +3,7 @@ package com.littlelemon.littlelemon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,7 +44,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -60,7 +64,15 @@ import com.littlelemon.littlelemon.ui.theme.LittleLemonColor
 //@Preview(showBackground = true)
 @Composable
 fun Home(navController: NavHostController, databaseMenuItems: List<MenuItemRoom>) {
-    Column() {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    Column(
+        modifier = Modifier.pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                keyboardController?.hide()
+            })
+        }
+    ) {
         var searchPhrase by remember { mutableStateOf("") }
         var buttonState = remember { mutableStateOf(ButtonState.OFF) }
         var filteredItems: List<MenuItemRoom> = emptyList()
