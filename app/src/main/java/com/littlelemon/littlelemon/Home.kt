@@ -28,6 +28,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -140,11 +141,15 @@ fun Home(navController: NavHostController, databaseMenuItems: List<MenuItemRoom>
                 onValueChange = {searchPhrase = it},
                 modifier = Modifier
                     .padding(start = 15.dp, end = 15.dp, top = 10.dp)
-                    .fillMaxWidth()
-                    .background(color = LittleLemonColor.cloud, shape = RoundedCornerShape(10.dp)),
+                    .fillMaxWidth(),
                 placeholder = { Text("Enter Search Phrase") },
                 leadingIcon = { Icon( imageVector = Icons.Default.Search, contentDescription = "") },
                 textStyle = TextStyle(fontSize = 18.sp),
+                shape = RoundedCornerShape(10.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = LittleLemonColor.cloud,
+                    unfocusedContainerColor = LittleLemonColor.cloud
+                )
             )
         }
         Column(
